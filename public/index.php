@@ -2,8 +2,21 @@
 
 declare(strict_types=1);
 
-$name = $_GET['name'] ?? 'Guest';
+require_once __DIR__.'/../vendor/autoload.php';
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 
-// header('X-Developer: frostell');
+$request = ServerRequestFactory::fromGlobals();
 
-echo 'Hello!'.$name;
+// Action
+$name = $request->getQueryParams()['name'] ?? 'Guest';
+
+$response = (new HtmlResponse('Hello, '.$name.'!'))
+    ->withHeader('X-Developer', 'frostell')
+;
+
+// Sending
+
+$emitter = new SapiEmitter();
+$emitter->emit($response);
